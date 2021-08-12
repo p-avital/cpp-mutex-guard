@@ -63,14 +63,14 @@ template<typename T>
 /// A C++ equivalent of Rust's std::sync::Mutex
 class Mutex {
 private:
-    std::mutex mutex;
-    T value;
+    mutable std::mutex mutex;
+    mutable T value;
 public:
     explicit Mutex(T value) : value(value) {}
 
     /// Tries to lock the mutex and returns a POTENTIALLY INVALID smart pointer to the value.
     /// Dropping the smart pointer will unlock the mutex if locking succeeded.
-    MutexGuard<T> try_lock() {
+    MutexGuard<T> try_lock() const {
         if (mutex.try_lock()) {
             return MutexGuard<T>(&value, &mutex);
         }
@@ -79,7 +79,7 @@ public:
 
     /// Locks the mutex and returns a smart pointer to the value.
     /// Dropping the smart pointer will unlock the mutex.
-    MutexGuard<T> lock() {
+    MutexGuard<T> lock() const {
         mutex.lock();
         return MutexGuard<T>(&value, &mutex);
     }
